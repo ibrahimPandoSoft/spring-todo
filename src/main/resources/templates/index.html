@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+        <link href="/main.css" rel="stylesheet">
+        <title>Todos list</title>
+    </head>
+    <body>
+        <div id="main-content" class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <table id="todos" class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>id</th>
+                            <th>Username</th>
+                            <th>Description</th>
+                            <th>Target Date</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody th:each="todo : ${todos}">
+                        <tr>
+                            <td th:text="${todo.id}">Id</td>
+                            <td th:text="${todo.username}">Username</td>
+                            <td th:text="${todo.description}">Description</td>
+                            <td th:text="${todo.targetDate}">Target Date</td>
+                            <td>
+                                <button class="btn btn-success">Update</button>
+                                <button class="btn btn-warning">Delete</button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+<!--  form to add new todo-->
+            <div class="row">
+                <div class="col-md-6">
+                    <h3>Add new todo</h3>
+                    <hr>
+                    <form class="form-inline" id="todo-form">
+                        <div class="form-group ">
+                        <label for="name">
+                        What is your username?</label>
+                        <input type="text" id="name" class="form-control" placeholder="Your name here...">
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label for="todo-description">description</label>
+                                <input type="text" id="todo-description" class="form-control" placeholder="Your todo description here...">
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="todo-deadline">deadline</label>
+                                <input type="date" id="todo-deadline" class="form-control" placeholder="Your todo deadline here...">®
+                            </div>
+                        </div>
+                        <div>
+                            <button id="send" class="btn btn-default mt-md" type="submit">Send</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    <script>
+        const form = document.getElementById('todo-form');
+        const nameInput = document.getElementById('name');
+        const todoDescriptionInput = document.getElementById('todo-description');
+        const todoDeadlineInput = document.getElementById('todo-deadline');
+
+        const sendForm = (event) => {
+            event.preventDefault();
+            const name = nameInput.value;
+            const todoDescription = todoDescriptionInput.value;
+            const todoDeadline = todoDeadlineInput.value;
+            const todo = {
+                username: name,
+                description: todoDescription,
+                targetDate: todoDeadline
+            };
+
+            fetch('/add-todos', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(todo)
+            })
+                .then(response => {
+                    if (response.ok) {
+                        console.log('Success=>', response);
+                        nameInput.value = '';
+                        todoDescriptionInput.value = '';
+                        todoDeadlineInput.value = '';
+                        return response.json();
+                    }
+                    throw new Error('Request failed!');
+                }, networkError => console.log(networkError.message))
+        };
+
+        form.addEventListener('submit', sendForm);
+
+
+    </script>
+    </body>
+</html>
